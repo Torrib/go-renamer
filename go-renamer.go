@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	path := getPath()
+	// path := getPath()
+	path := "C:\\Users\\fba95\\Desktop\\root"
 
 	folders := getFiles(path)
 
@@ -27,21 +28,20 @@ func processFolder(path string, parent string) {
 
 	subFolder := getFirstFolder(files)
 
-	if subFolder == nil {
-		renameFiles(path, parent, folderName, files)
-	} else {
-		subFolderPath := filepath.Join(path, subFolder.Name())
-		processFolder(subFolderPath, folderName)
+	for i := 0; i < len(files); i++ {
+		if files[i].IsDir() {
+			subFolderPath := filepath.Join(path, subFolder.Name())
+			processFolder(subFolderPath, folderName)
+		} else {
+			renameFile(path, parent, folderName, files[i])
+		}
 	}
+	log.Printf("Processed: %s (%d)\n", folderName, len(files))
 }
 
-func renameFiles(path string, parent string, folderName string, files []fs.DirEntry) {
-	for i := 0; i < len(files); i++ {
-		newName := createNewName(parent, folderName, files[i].Name())
-		os.Rename(filepath.Join(path, files[i].Name()), filepath.Join(path, newName))
-	}
-
-	log.Printf("Processed: %s (%d)\n", folderName, len(files))
+func renameFile(path string, parent string, folderName string, file fs.DirEntry) {
+	newName := createNewName(parent, folderName, file.Name())
+	os.Rename(filepath.Join(path, file.Name()), filepath.Join(path, newName))
 }
 
 func createNewName(parent string, folderName string, fileName string) string {
